@@ -1,0 +1,65 @@
+GET / HTTP/1.1
+Host: 127.0.0.1
+Connection: keep-alive
+Cache-Control: max-age=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.152 Safari/535.19 CoolNovo/2.0.3.55
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4
+Accept-Charset: Big5,utf-8;q=0.7,*;q=0.3
+
+POST /cal-x/update_code/ HTTP/1.1
+Host: 140.135.11.169
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/20100101 Firefox/17.0
+Accept: text/plain, */*; q=0.01
+Accept-Language: zh-tw,zh;q=0.8,en-us;q=0.5,en;q=0.3
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+X-Requested-With: XMLHttpRequest
+Referer: http://140.135.11.169/exam/
+Content-Length: 84
+Cookie: csrftoken=0ad0b197711465df134f812fd165da9b; sessionid=0591234ba6872c802b35a1ee91e382bd
+Pragma: no-cache
+Cache-Control: no-cache
+
+lang=1&question=1&code=POSTData&csrfmiddlewaretoken=0ad0b197711465df134f812fd165da9b
+
+HEAD /index.html HTTP/1.1
+
+Date: Wed, 19 Dec 2012 12:52:11 GMT
+
+Accept: */*
+
+Host: 140.135.11.170:8888
+
+User-Agent: Winie/1.0.10
+
+//-------------------------------------//
+PUT /index.html HTTP/1.1
+
+Date: Wed, 19 Dec 2012 12:52:16 GMT
+
+Content-Length: 1512
+
+Content-Type: text/html
+
+Accept: */*
+
+Expect: 100-Continue
+
+Host: 140.135.11.170:8888
+
+User-Agent: Winie/1.0.10
+abs_path      = "/"  path_segments
+path_segments = segment *( "/" segment )
+segment       = *pchar *( ";" param )
+param         = *pchar
+pchar         = unreserved | escaped |
+                ":" | "@" | "&" | "=" | "+" | "$" | ","
+unreserved  = alphanum | mark
+alphanum    = 'a'-'Z' | 0-9
+mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
+escaped     = "%" hex hex
+hex         = digit | "A" | "B" | "C" | "D" | "E" | "F" |
+              "a" | "b" | "c" | "d" | "e" | "f"
