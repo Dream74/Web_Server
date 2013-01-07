@@ -49,9 +49,9 @@ int ex_hash_add(ex_hashmap *hm, const void *key, const void *value)
 
 void* ex_hash_find(const ex_hashmap *hm, const void *key)
 {
-  void *ret = NULL ;
   int pos = hm->hashfun( key )%hm->size ;
   ex_hashlist *nlh = hm->buckets[pos] ;
+  void *ret = NULL ;
   while ( nlh!=NULL ) {
     if ( hm->hashcmp( nlh->key, key ) ) {
       ret = nlh->value ;

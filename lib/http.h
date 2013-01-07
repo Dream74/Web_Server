@@ -32,7 +32,7 @@ extern "C" {
 #define ExpireTime 	(24 * 60 * 60)
 
   /* default listen port */
-#define SERVER_PORT 80
+#define SERVER_PORT 8888
 
   /* max pending-socket number */
 #define SERVER_BACKLOG 5
@@ -52,7 +52,8 @@ extern "C" {
 
   /* the max size we read socket once */
 #define EX_TCP_QUAN 		(2 * 1024)
-
+  /* max heads in http/1.1 support max:64.
+   * but here we only support 40*/
 #define	MAX_HTTP_HEADERS	40
 
   typedef struct {
