@@ -34,7 +34,7 @@ int cgi_page_login(ExHttp *pHttp)
 {
   const char *smsg = "login success" ;
   const char *emsg = "login error" ;
-  static const char *user = "eserv" ;
+  static const char *user = "dream" ;
   static const char *passwd = "passwd" ;
 
   const char *pRet = emsg ;

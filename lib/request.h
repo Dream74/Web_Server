@@ -19,8 +19,6 @@ extern "C" {
   const char *get_param_info(const ExHttp *pHttp, const char *key);
   int ex_send_file(ExHttp *pHttp, const char *filePath);
   int ex_send_msg(ExHttp *pHttp, const char *type, const char *buf, size_t len);
-  const char *get_head_info(const ExHttp *pHttp, const char *key);
-  const char *get_param_info(const ExHttp *pHttp, const char *key);
 #ifdef	__cplusplus
 }
 #endif

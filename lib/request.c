@@ -36,6 +36,8 @@ static int sendHead(const ExHttp *pHttp, char *pBuf, size_t len)
 {
   static size_t login_num = 0 ;
   const char * hasLogin = get_head_info( pHttp, "Cookie" ) ;
+
+  // const char * hasLogin = NULL ;
   size_t nLen ;
   hasLogin = (hasLogin==NULL) ? "No" : "Yes" ;
 
@@ -271,14 +273,14 @@ void requestHandler(void * s)
     // strcat(recvBuf + httpInfo.recvLen , skipBrake);
     /* if method is not implemented */
     if ( checkmethod( &httpInfo )<0 ) {
-      DBG( "len: %d %s", httpInfo.method ) ;
+      // DBG( "len: %s", httpInfo.method ) ;
+      ex_error_reply( &httpInfo, 400 ) ;
       // ex_error_reply( &httpInfo, 501 ) ;
-      // break ;
+      break ;
     }
 
     if ( parseURL( &httpInfo )<0 ) {
       DBG( "url: %s protocol %s", httpInfo.url, httpInfo.protocol ) ;
-      ex_error_reply( &httpInfo, 400 ) ;
       errorLog( &httpInfo, "parseURL error" ) ;
       break ;
     }
@@ -289,17 +291,6 @@ void requestHandler(void * s)
       break ;
     }
 
-    if ( strcmp( httpInfo.url, "/index.jsp" )==0 ) {
-      ex_error_reply( &httpInfo, 301 ) ;
-      const char * method = httpInfo.method ;
-      char * message = "Location: http://127.0.0.1/index.html" ;
-      size_t size = strlen( message ) ;
-      if ( *method=='G'|| *method=='H' ) {
-        ex_sock_nwrite( httpInfo.sock, message, size ) ;
-      }
-      errorLog( &httpInfo, "Moved Permanently" ) ;
-      break ;
-    }
 
     /* if parse head error */
     if ( parseHeader( &httpInfo )<0 ) {
@@ -310,6 +301,18 @@ void requestHandler(void * s)
       break ;
     }
 
+    if ( strcmp( httpInfo.url, "/index.jsp" )==0 ) {
+      ex_error_reply( &httpInfo, 301 ) ;
+      const char * method = httpInfo.method ;
+      char * message = "<a href=\"/index.html\"> Location: http://127.0.0.1/index.html</a>" ;
+      size_t size = strlen( message ) ;
+      if ( *method=='G'|| *method=='H' ) {
+        ex_sock_nwrite( httpInfo.sock, message, size ) ;
+      }
+      errorLog( &httpInfo, "Moved Permanently" ) ;
+      clearHttp( &httpInfo ) ;
+      break ;
+    }
 
     /* if reply error */
     if ( replyHandler( &httpInfo )<0 ) {
