@@ -10,8 +10,7 @@
             <sourceEncoding>x-windows-950</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>D:\Dropbox\Computer Networks and the Internet\Web_Server\lib</sourceRootElem>
-                <sourceRootElem>F:\Dropbox\Dropbox\Computer Networks and the Internet\Web_Server\lib</sourceRootElem>
+                <sourceRootElem>/Users/dream/Desktop/Web_Server/lib</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

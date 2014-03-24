@@ -22,7 +22,7 @@ extern "C" {
 
 #define _DEBUG 
 
-#define SERVER "DServ/0.1"
+#define SERVER "Dream web server/0.1"
 
 #define INDEXFILE "index.html"
 #define ROOTPATH "www"
@@ -32,7 +32,7 @@ extern "C" {
 #define ExpireTime 	(24 * 60 * 60)
 
   /* default listen port */
-#define SERVER_PORT 8888
+#define SERVER_PORT 80
 
   /* max pending-socket number */
 #define SERVER_BACKLOG 5

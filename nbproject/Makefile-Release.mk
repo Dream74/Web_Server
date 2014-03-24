@@ -14,14 +14,15 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=gcc.exe
-CCC=g++.exe
-CXX=g++.exe
+CC=gcc
+CCC=g++
+CXX=g++
 FC=gfortran
-AS=as.exe
+AS=as
 
 # Macros
-CND_PLATFORM=MinGW-Windows
+CND_PLATFORM=GNU-MacOSX
+CND_DLIB_EXT=dylib
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -34,15 +35,15 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/1457788035/io.o \
-	${OBJECTDIR}/_ext/1457788035/http.o \
-	${OBJECTDIR}/_ext/1457788035/analysis.o \
-	${OBJECTDIR}/_ext/1457788035/mempool.o \
-	${OBJECTDIR}/_ext/1457788035/misc.o \
-	${OBJECTDIR}/_ext/1457788035/hash.o \
-	${OBJECTDIR}/_ext/1457788035/request.o \
-	${OBJECTDIR}/main.o \
-	${OBJECTDIR}/_ext/1457788035/cgi.o
+	${OBJECTDIR}/lib/analysis.o \
+	${OBJECTDIR}/lib/cgi.o \
+	${OBJECTDIR}/lib/hash.o \
+	${OBJECTDIR}/lib/http.o \
+	${OBJECTDIR}/lib/io.o \
+	${OBJECTDIR}/lib/mempool.o \
+	${OBJECTDIR}/lib/misc.o \
+	${OBJECTDIR}/lib/request.o \
+	${OBJECTDIR}/main.o
 
 
 # C Compiler Flags
@@ -63,56 +64,56 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server.exe
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server.exe: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server ${OBJECTFILES} ${LDLIBSOPTIONS} 
+	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/_ext/1457788035/io.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/io.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/analysis.o: lib/analysis.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/io.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/io.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/analysis.o lib/analysis.c
 
-${OBJECTDIR}/_ext/1457788035/http.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/http.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/cgi.o: lib/cgi.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/http.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/http.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/cgi.o lib/cgi.c
 
-${OBJECTDIR}/_ext/1457788035/analysis.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/analysis.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/hash.o: lib/hash.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/analysis.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/analysis.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/hash.o lib/hash.c
 
-${OBJECTDIR}/_ext/1457788035/mempool.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/mempool.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/http.o: lib/http.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/mempool.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/mempool.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/http.o lib/http.c
 
-${OBJECTDIR}/_ext/1457788035/misc.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/misc.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/io.o: lib/io.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/misc.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/misc.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/io.o lib/io.c
 
-${OBJECTDIR}/_ext/1457788035/hash.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/hash.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/mempool.o: lib/mempool.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/hash.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/hash.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/mempool.o lib/mempool.c
 
-${OBJECTDIR}/_ext/1457788035/request.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/request.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
+${OBJECTDIR}/lib/misc.o: lib/misc.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/request.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/request.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/misc.o lib/misc.c
+
+${OBJECTDIR}/lib/request.o: lib/request.c 
+	${MKDIR} -p ${OBJECTDIR}/lib
+	${RM} $@.d
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/lib/request.o lib/request.c
 
 ${OBJECTDIR}/main.o: main.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/main.o main.c
-
-${OBJECTDIR}/_ext/1457788035/cgi.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/cgi.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1457788035
-	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1457788035/cgi.o /F/Dropbox/Dropbox/Computer\ Networks\ and\ the\ Internet/Web_Server/lib/cgi.c
 
 # Subprojects
 .build-subprojects:
@@ -120,7 +121,7 @@ ${OBJECTDIR}/_ext/1457788035/cgi.o: /F/Dropbox/Dropbox/Computer\ Networks\ and\ 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server.exe
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/web_server
 
 # Subprojects
 .clean-subprojects:

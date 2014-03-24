@@ -13,6 +13,20 @@ extern "C" {
 #endif
 
 #include "http.h"
+
+/*
+ *  一直讀到切到 token 這字元
+ */
+#define SKIP(ppBuf ,token) \
+do { \
+	char *cp = *(ppBuf); \
+	while (*cp != (token)){ \
+		++cp; \
+	} \
+	*cp = '\0'; \
+	*(ppBuf) = ++cp; \
+} while (0)
+
   int checkmethod(ExHttp *pHttp);
   int parseURL(ExHttp *pHttp);
   int parseHeader(ExHttp *pHttp);

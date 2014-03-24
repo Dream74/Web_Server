@@ -155,6 +155,44 @@ int writeFileStream(const char * filePath, char * buf, size_t filesize)
   return rSize ;
 }
 
+int sendFileRangeStream(const ExHttp *pHttp, const char *filePath, int start, int end)
+{
+  // printf( "Range Start :%d Range End :%d\n", start, end ) ;
+
+  char buf[PAGE_SIZE] ;
+  int rSize ;
+  int ret = 0 ;
+  FILE * fd = fopen( filePath, "rb" ) ;
+  assert( fd>=0 ) ;
+
+  int fReadSum = 0 ;
+  /*
+   * skip before char 
+   */
+  int skipsum = start ;
+  int readNum = (skipsum<PAGE_SIZE) ? skipsum : PAGE_SIZE ;
+  while ( (rSize = fread( ( char * ) &buf, 1, readNum, fd ))>0 ) {
+    fReadSum += rSize ;
+    skipsum -= rSize ;
+    readNum = (skipsum<PAGE_SIZE) ? skipsum : PAGE_SIZE ;
+  }
+
+  // printf( "skipNum :%d\n", fReadSum ) ;
+  int readSum = end - fReadSum ;
+  readNum = (readSum<PAGE_SIZE) ? readSum : PAGE_SIZE ;
+  while ( (rSize = fread( ( char * ) &buf, 1, readNum, fd ))>0 ) {
+    if ( (ret = ex_sock_nwrite( pHttp->sock, ( char * ) &buf, rSize ))<0 )
+      break ;
+    fReadSum += rSize ;
+    readSum -= rSize ;
+    readNum = (readSum<PAGE_SIZE) ? readSum : PAGE_SIZE ;
+  }
+
+ // printf( "readNum :%d\n", fReadSum ) ;
+  fclose( fd ) ;
+  return ret ;
+}
+
 int sendFileStream(const ExHttp *pHttp, const char *filePath)
 {
   char buf[PAGE_SIZE] ;

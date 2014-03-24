@@ -1,4 +1,6 @@
 #include <string.h>
+#include <time.h>
+
 #include "request.h"
 #include "analysis.h"
 #include "misc.h"
@@ -10,16 +12,37 @@
  */
 static int fileSet(char *buf, const ExHttp *pHttp)
 {
+  char date[35] ;
+  strftime( date, 35, "%a, %d %b %Y %X GMT", localtime( &(pHttp->st.st_ctime) ) ) ;
+  printf( "%s\n", date ) ;
+  char expireDate[35] ;
+  time_t expDate = time( NULL ) + ( time_t ) ExpireTime ;
+  strftime( expireDate, 35, "%a, %d %b %Y %X GMT", localtime( &expDate ) ) ;
+
   return sprintf( buf, "Content-Type: %s\n"
           "Content-Length: %d\n"
           "Cache-Control: max-age=%ld\n"
+          "Last-Modified: %s\n"
+          "expire: %s\n"
           "ETag: %lx.%lx\n",
           get_mime_type( pHttp->url ),
           ( int ) pHttp->st.st_size,
           ( long int ) ExpireTime,
+          date,
+          expireDate,
           pHttp->st.st_size,
           pHttp->st.st_mtime
           ) ;
+}
+
+static int setCookie(char * buf, const ExHttp * pHttp)
+{
+  static size_t login_num = 0 ;
+  const char * hasLogin = get_head_info( pHttp, "Cookie" ) ;
+  hasLogin = (hasLogin==NULL) ? "No" : "Yes" ;
+
+  return sprintf( buf, "Set-Cookie: loginNum=%d; YesLogin=%s\n"
+          , ++login_num, hasLogin ) ;
 }
 
 const char *get_head_info(const ExHttp *pHttp, const char *key)
@@ -34,14 +57,9 @@ const char *get_param_info(const ExHttp *pHttp, const char *key)
 
 static int sendHead(const ExHttp *pHttp, char *pBuf, size_t len)
 {
-  static size_t login_num = 0 ;
-  const char * hasLogin = get_head_info( pHttp, "Cookie" ) ;
   size_t nLen ;
-  hasLogin = (hasLogin==NULL) ? "No" : "Yes" ;
 
-  nLen = sprintf( pBuf+len, "Server: " SERVER "\n"
-          "Set-Cookie: loginNum=%d; YesLogin=%s\n"
-          "\n", ++login_num, hasLogin ) ;
+  nLen = sprintf( pBuf+len, "Server: " SERVER "\n\n" ) ;
   return ex_sock_nwrite( pHttp->sock, pBuf, len+nLen ) ;
 }
 
@@ -51,10 +69,12 @@ static int codeSet(char *pBuf, int code)
   const char *c200 = "OK" ;
   const char *c201 = "Created" ;
   const char *c204 = "No Content" ;
+  const char *c206 = "Partial content" ;
   const char *c304 = "Not Modified" ;
   const char *c301 = "Moved Permanently" ;
   const char *c400 = "Bad Request " ;
   const char *c404 = "Not Found" ;
+  const char *c412 = "Precondition Failed" ;
   const char *c501 = "Not Implemented" ;
   const char *c505 = "HTTP Version Not Supported" ;
 
@@ -72,6 +92,9 @@ static int codeSet(char *pBuf, int code)
     case 204:
       msg = c204 ;
       break ;
+    case 206:
+      msg = c206 ;
+      break ;
     case 301:
       msg = c301 ;
       break ;
@@ -83,6 +106,9 @@ static int codeSet(char *pBuf, int code)
       break ;
     case 404:
       msg = c404 ;
+      break ;
+    case 412:
+      msg = c412 ;
       break ;
     case 501:
       msg = c501 ;
@@ -123,12 +149,53 @@ static int staticProcess(const ExHttp *pHttp)
     pBuf += fileSet( pBuf, pHttp ) ;
   }
 
+  if ( strcmp( get_mime_type( pHttp->url ), "image/png" )!=0 )
+    pBuf += setCookie( pBuf, pHttp ) ;
+
   do {
+    if ( code==206 ) {
+      char rangeTemp[128] ;
+      char * range = ( char * ) get_head_info( pHttp, "Range" ) ;
+      strncpy( ( char * ) &rangeTemp, range, 128 ) ;
+      range = ( char * ) &rangeTemp ;
+      SKIP( &range, '=' ) ;
+      char * sRange = range ;
+      SKIP( &range, '-' ) ;
+
+      char date[35] ;
+      strftime( date, 35, "%a, %d %b %Y %X GMT", localtime( &(pHttp->st.st_ctime) ) ) ;
+
+      int startRange = (*sRange=='\0') ? -1 : atoi( sRange ) ;
+      int endRange = (*range=='\0') ? -1 : atoi( range ) ;
+			// printf("start :%d end :%d\n",startRange,endRange ) ;
+      if ( startRange<0 ) {
+        startRange = pHttp->st.st_size-endRange ;
+        endRange = pHttp->st.st_size ;
+      }
+      else if ( endRange<0 ) {
+        endRange = pHttp->st.st_size ;
+      }
+      pBuf += sprintf( pBuf, "connection: close\n"
+              "Last-Modified: %s\n"
+              "Accept-Ranges: bytes\n"
+              "Content-Length: %d\n"
+              "Content-Range: bytes %d-%d/%d\n",
+              date,
+              endRange-startRange,
+              startRange,
+              endRange,
+              pHttp->st.st_size
+              ) ;
+      if ( (ret = sendHead( pHttp, buf, pBuf-buf ))<0 )
+        break ;
+      ret = sendFileRangeStream( pHttp, pHttp->url, startRange, endRange + 1 ) ;
+      break ;
+    }
+
     if ( (ret = sendHead( pHttp, buf, pBuf-buf ))<0 )
       break ;
 
-    if ( 'H'== *(pHttp->method) )
-      // if ( code==304||'H'== *(pHttp->method) )
+    if ( code==304|| code == 412 || 'H'== *(pHttp->method) )
       break ;
     ret = sendFileStream( pHttp, pHttp->url ) ;
   } while ( 0 ) ;
@@ -195,9 +262,9 @@ int putProcess(const ExHttp * pHttp, int rType)
       break ;
   }
   pBuf += codeSet( pBuf, code ) ;
-  strcat( pBuf, "\n\n" ) ;
+  pBuf += sprintf( pBuf, "Connection: close\n" ) ;
   ret = sendHead( pHttp, buf, pBuf-buf ) ;
-  return ret ;
+  return -1 ;
 }
 
 int deleteProcess(const ExHttp * pHttp, int rType)
@@ -263,15 +330,19 @@ void requestHandler(void * s)
     if ( ExContext.quitFlag ) break ;
 
     httpInfo.recvLen = ex_read_head( sock, recvBuf, MAX_HEADER_SIZE ) ;
+
     if ( httpInfo.recvLen<=0 ) break ;
 
     httpInfo.curPos = recvBuf ;
     recvBuf[httpInfo.recvLen] = '\0' ;
-
+    printf( "%s", recvBuf ) ;
     // strcat(recvBuf + httpInfo.recvLen , skipBrake);
     /* if method is not implemented */
     if ( checkmethod( &httpInfo )<0 ) {
-      DBG( "len: %d %s", httpInfo.method ) ;
+      DBG( "len: %s", httpInfo.method ) ;
+      ex_error_reply( &httpInfo, 400 ) ;
+      errorLog( &httpInfo, "parseURL error" ) ;
+      break ;
       // ex_error_reply( &httpInfo, 501 ) ;
       // break ;
     }
@@ -289,6 +360,16 @@ void requestHandler(void * s)
       break ;
     }
 
+
+    /* if parse head error */
+    if ( parseHeader( &httpInfo )<0 ) {
+      ex_error_reply( &httpInfo, 400 ) ;
+      /* bad Request */
+      errorLog( &httpInfo, "parse head error" ) ;
+      clearHttp( &httpInfo ) ;
+      break ;
+    }
+
     if ( strcmp( httpInfo.url, "/index.jsp" )==0 ) {
       ex_error_reply( &httpInfo, 301 ) ;
       const char * method = httpInfo.method ;
@@ -300,16 +381,6 @@ void requestHandler(void * s)
       errorLog( &httpInfo, "Moved Permanently" ) ;
       break ;
     }
-
-    /* if parse head error */
-    if ( parseHeader( &httpInfo )<0 ) {
-      ex_error_reply( &httpInfo, 400 ) ;
-      /* bad Request */
-      errorLog( &httpInfo, "parse head error" ) ;
-      clearHttp( &httpInfo ) ;
-      break ;
-    }
-
 
     /* if reply error */
     if ( replyHandler( &httpInfo )<0 ) {

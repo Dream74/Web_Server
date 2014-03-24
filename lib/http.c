@@ -159,10 +159,11 @@ void cgi_page_add(const char * pageName, void *f)
 void ex_uninit(void)
 {
   ExContext.quitFlag = 1 ;
-
+#ifndef _DEBUG
   while ( ExContext.threadCnt>0 )
     ex_sleep( EX_SOCK_RTT ) ;
-
+#endif
+	
   cgi_uninit( ) ;
 
   ex_hash_clear( &ExContext.mimeMap ) ;
